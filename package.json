@@ -1,0 +1,21 @@
+{
+  "name": "pixel-office",
+  "version": "1.0.0",
+  "description": "像素办公室 - Claude Code 进程可视化游戏",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["phaser", "pixel-art", "game", "visualization", "claude-code"],
+  "license": "MIT",
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}
