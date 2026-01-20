@@ -6,6 +6,7 @@ import { ProcessData } from '../../data/types';
 
 export class OfficeScene extends Phaser.Scene {
   private _floor!: Phaser.GameObjects.TileSprite;
+  private _background?: Phaser.GameObjects.Image;
   private office!: Office;
   private processManager!: ProcessManager;
   private unsubscribe?: () => void;
@@ -14,14 +15,34 @@ export class OfficeScene extends Phaser.Scene {
   constructor() { super({ key: 'OfficeScene' }); }
 
   create(): void {
-    this._floor = this.add.tileSprite(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, 'floor_tile').setDepth(0);
+    // 尝试使用高质量背景，否则使用平铺地板
+    if (this.textures.exists('office_bg')) {
+      this._background = this.add.image(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, 'office_bg')
+        .setDisplaySize(GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT)
+        .setDepth(0);
+      // 添加半透明遮罩让角色更突出
+      this.add.graphics()
+        .fillStyle(0x1a1a2e, 0.3)
+        .fillRect(0, 0, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT)
+        .setDepth(0.5);
+    } else {
+      this._floor = this.add.tileSprite(GAME_CONFIG.WIDTH / 2, GAME_CONFIG.HEIGHT / 2, GAME_CONFIG.WIDTH, GAME_CONFIG.HEIGHT, 'floor_tile').setDepth(0);
+    }
 
+    // 装饰性植物
     [{ x: 50, y: 100 }, { x: GAME_CONFIG.WIDTH - 50, y: 100 }, { x: 50, y: GAME_CONFIG.HEIGHT - 60 }, { x: GAME_CONFIG.WIDTH - 50, y: GAME_CONFIG.HEIGHT - 60 }]
       .forEach(pos => this.add.image(pos.x, pos.y, 'plant').setScale(1.5).setDepth(1));
 
     this.office = new Office(this);
-    this.add.text(GAME_CONFIG.WIDTH / 2, 25, '🏢 像素办公室', { font: 'bold 22px Arial', color: '#ffffff' }).setOrigin(0.5).setDepth(100);
-    this.add.text(GAME_CONFIG.WIDTH / 2, 48, 'Claude Code 进程可视化', { font: '12px Arial', color: '#94a3b8' }).setOrigin(0.5).setDepth(100);
+
+    // 标题区域 - 添加渐变背景
+    const titleBg = this.add.graphics();
+    titleBg.fillGradientStyle(0x1a1a2e, 0x1a1a2e, 0x1a1a2e, 0x1a1a2e, 0.9, 0.9, 0, 0);
+    titleBg.fillRect(0, 0, GAME_CONFIG.WIDTH, 70);
+    titleBg.setDepth(99);
+
+    this.add.text(GAME_CONFIG.WIDTH / 2, 25, '🏢 像素办公室', { font: 'bold 24px Arial', color: '#ffffff', shadow: { offsetX: 2, offsetY: 2, color: '#000', blur: 4, fill: true } }).setOrigin(0.5).setDepth(100);
+    this.add.text(GAME_CONFIG.WIDTH / 2, 50, 'Claude Code 进程可视化', { font: '14px Arial', color: '#94a3b8' }).setOrigin(0.5).setDepth(100);
 
     this.scene.launch('UIScene');
 

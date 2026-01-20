@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { COLORS } from '../../utils/constants';
 
 export class BootScene extends Phaser.Scene {
+  private useExternalAssets = true; // 使用外部生成的素材
+
   constructor() { super({ key: 'BootScene' }); }
 
   preload(): void {
@@ -11,7 +13,7 @@ export class BootScene extends Phaser.Scene {
     progressBox.fillStyle(0x222222, 0.8);
     progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
     const progressBar = this.add.graphics();
-    const loadingText = this.add.text(width / 2, height / 2 - 50, '加载中...', { font: '20px Arial', color: '#ffffff' }).setOrigin(0.5);
+    const loadingText = this.add.text(width / 2, height / 2 - 50, '🎮 像素办公室加载中...', { font: '20px Arial', color: '#ffffff' }).setOrigin(0.5);
     const percentText = this.add.text(width / 2, height / 2, '0%', { font: '18px Arial', color: '#ffffff' }).setOrigin(0.5);
 
     this.load.on('progress', (value: number) => {
@@ -21,7 +23,20 @@ export class BootScene extends Phaser.Scene {
       progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
     });
     this.load.on('complete', () => { progressBar.destroy(); progressBox.destroy(); loadingText.destroy(); percentText.destroy(); });
+
+    if (this.useExternalAssets) {
+      this.loadExternalAssets();
+    }
+    // 始终创建程序化素材作为备用
     this.createPixelArtAssets();
+  }
+
+  private loadExternalAssets(): void {
+    // 加载 Gemini 生成的高质量素材
+    this.load.image('office_bg', 'assets/office_background.png');
+    this.load.image('floor_tile_hq', 'assets/floor_tile.png');
+    this.load.image('furniture_sheet', 'assets/furniture.png');
+    this.load.image('employees_hq', 'assets/employees_sprite.png');
   }
 
   create(): void { this.scene.start('OfficeScene'); }
